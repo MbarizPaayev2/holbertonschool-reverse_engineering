@@ -23,7 +23,7 @@ else
     exit 1
 fi
 
-# Verify if the file is an ELF binary using the readelf header check
+# Verify if the file is an ELF binary using readelf header check
 if ! readelf -h "$file_name" > /dev/null 2>&1; then
     echo "Error: '$file_name' is not a valid ELF file." >&2
     exit 1
@@ -32,17 +32,17 @@ fi
 # Extract ELF header details using readelf
 header_info=$(readelf -h "$file_name")
 
-# 1. Extract Magic Number (e.g., 7f 45 4c 46 ...)
+# 1. Extract Magic Number
 magic_number=$(echo "$header_info" | grep -i "Magic:" | sed -E 's/^[[:space:]]*Magic:[[:space:]]*//')
 
-# 2. Extract Class (e.g., ELF32 or ELF64)
-class=$(echo "$header_info" | grep -i "Class:" | awk -F: '{print $2}' | xargs)
+# 2. Extract Class (ELF32 or ELF64)
+class=$(echo "$header_info" | grep -i "Class:" | awk -F: '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-# 3. Extract Byte Order / Data (e.g., 2's complement, little endian)
-byte_order=$(echo "$header_info" | grep -i "Data:" | awk -F: '{print $2}' | xargs)
+# 3. Extract Byte Order (e.g. extracts "little endian" or "big endian")
+byte_order=$(echo "$header_info" | grep -i "Data:" | sed -E 's/.*, ([^,]+)/\1/' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-# 4. Extract Entry Point Address (e.g., 0x1050)
-entry_point_address=$(echo "$header_info" | grep -i "Entry point address:" | awk -F: '{print $2}' | xargs)
+# 4. Extract Entry Point Address
+entry_point_address=$(echo "$header_info" | grep -i "Entry point address:" | awk -F: '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
 # Call the function defined in messages.sh
 display_elf_header_info
