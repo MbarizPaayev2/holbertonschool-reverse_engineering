@@ -33,16 +33,16 @@ fi
 header_info=$(readelf -h "$file_name")
 
 # 1. Extract Magic Number
-magic_number=$(echo "$header_info" | grep -i "Magic:" | sed -E 's/^[[:space:]]*Magic:[[:space:]]*//')
+magic_number=$(echo "$header_info" | grep -i "Magic:" | sed -E 's/^[[:space:]]*Magic:[[:space:]]*//' | sed 's/[[:space:]]*$//')
 
 # 2. Extract Class (ELF32 or ELF64)
 class=$(echo "$header_info" | grep -i "Class:" | awk -F: '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-# 3. Extract Byte Order (e.g. extracts "little endian" or "big endian")
+# 3. Extract Byte Order ("little endian" or "big endian")
 byte_order=$(echo "$header_info" | grep -i "Data:" | sed -E 's/.*, ([^,]+)/\1/' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
 # 4. Extract Entry Point Address
 entry_point_address=$(echo "$header_info" | grep -i "Entry point address:" | awk -F: '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
-# Call the function defined in messages.sh
+# Call the function defined in messages.sh without adding extra echoes
 display_elf_header_info
